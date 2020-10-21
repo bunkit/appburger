@@ -1,5 +1,5 @@
 import React, { useEffect} from 'react';
-import Aux from '../../../hoc/Aux';
+import Aux from '../../../hoc/Aux/Aux';
 import classes from './Modal.module.css'
 import BackDrop from '../Backdrop/Backdrop';
 
@@ -23,4 +23,9 @@ const Modal = (props) => {
       )
 }
 
-export default React.memo(Modal,(prevProps, nextProps) => prevProps.show === nextProps.show);
+export default React.memo(Modal,(prevProps, nextProps) => {
+    return (
+        // prevProps.show === nextProps.show || prevProps.children === nextProps.children
+        false
+    )
+});

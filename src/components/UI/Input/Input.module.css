@@ -1,0 +1,19 @@
+.Input {
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: all 0.4s ease-in-out;
+}
+
+.Input:hover {
+  background: #ddd;
+}
+
+.Label {
+  display: block;
+  text-align: left;
+}
