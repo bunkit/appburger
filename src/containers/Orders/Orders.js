@@ -27,8 +27,9 @@ class Orders extends Component {
             })
     }
     render() {
-        let orderList = this.state.orders.map(item => (
-            <Order key={item.id} ingredients={item.ingredients} price={item.price} />
+        const reverse = this.state.orders.reverse();
+        let orderList = reverse.map(item => (
+            <Order key={item.id} orderData={item.orderData} ingredients={item.ingredients} price={item.price} />
         ))
         if (this.state.loading) {
             orderList = <Spinner />

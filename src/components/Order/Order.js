@@ -29,6 +29,12 @@ const order = (props) => {
                 }
                 )}
             </ul>
+            <div>
+                <h3>Deliver to: {props.orderData.name}</h3>
+                <p>{props.orderData.street + ' ' + props.orderData.zipCode + ' ' + props.orderData.country}</p>
+                <p>Dilevery method: {props.orderData.deliveryMethod}</p>
+                <br />
+            </div>
             <p className={classes.Price}> <strong> USD {props.price} </strong> </p>
         </div>
     )
