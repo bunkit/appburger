@@ -9,7 +9,7 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinener/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
-import * as actionTypes from '../../store/actions';
+import * as action from '../../store/actions/index';
 
 
 
@@ -19,17 +19,10 @@ class BurgerBuilder extends Component {
     state = {
         purchasing: false,
         loading: false,
-        error: false
     }
-    //componentDidMount() {
-    // axios.get('https://react-my-burger-d4cec.firebaseio.com/ingredients.json')
-    //     .then(response => {
-    //         this.setState({ ingredients: response.data })
-    //     })
-    //     .catch(err => {
-    //         this.setState({ error: true })
-    //     });
-    //}
+    componentDidMount() {
+        this.props.onFetchIngredients('https://react-my-burger-d4cec.firebaseio.com/ingredients.json');
+    }
 
 
 
@@ -53,6 +46,7 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
+        this.props.onPurchaseInit();
         this.props.history.push('checkout')
     }
 
@@ -65,7 +59,7 @@ class BurgerBuilder extends Component {
         }
         let orderSummary = null;
 
-        let burger = this.state.error ? <h2 style={{ textAlign: 'center' }}>Ooops.... <br /> Data Cannot be Found!!</h2> : <Spinner />
+        let burger = this.props.error ? <h2 style={{ textAlign: 'center' }}>Ooops.... <br /> Data Cannot be Found!!</h2> : <Spinner />
         if (this.props.igr) {
             burger = (
                 <Aux>
@@ -103,15 +97,18 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = state => {
     return {
-        igr: state.ingredients,
-        tPrice: state.totalPrice
+        igr: state.burgerBuilderReducer.ingredients,
+        tPrice: state.burgerBuilderReducer.totalPrice,
+        error: state.burgerBuilderReducer.error
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAddIngredients: (ingredientName) => dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName: ingredientName }),
-        onRemoveIngredients: (ingredientName) => dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingredientName })
+        onAddIngredients: (ingredientName) => dispatch(action.addIngredient(ingredientName)),
+        onRemoveIngredients: (ingredientName) => dispatch(action.removeIngredient(ingredientName)),
+        onFetchIngredients: (url) => dispatch(action.fetchIngredients(url)),
+        onPurchaseInit: () => dispatch(action.purchaseInit())
     }
 }
 

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
-
 import ContactData from './ContactData/ContactData';
+
 
 class Checkout extends Component {
 
@@ -14,23 +14,30 @@ class Checkout extends Component {
         this.props.history.replace('/checkout/contact-data');
     }
     render() {
-        return (
-            <div>
-                <CheckoutSummary
-                    ingredients={this.props.ing}
-                    checkoutCancelled={this.checkoutCancelledHandler}
-                    checkoutContinued={this.checkoutContinuedHandler}
-                />
+        let summary = <Redirect to="/burger-builder" />;
+        if (this.props.ing) {
+            const purchased = this.props.purchased ? <Redirect to="/burger-builder" /> : null;
+            summary = (
+                <div>
+                    {purchased}
+                    <CheckoutSummary
+                        ingredients={this.props.ing}
+                        checkoutCancelled={this.checkoutCancelledHandler}
+                        checkoutContinued={this.checkoutContinuedHandler}
+                    />
 
-                <Route path={this.props.match.path + '/contact-data'} component={ContactData} />
-            </div>
-        )
+                    <Route path={this.props.match.path + '/contact-data'} component={ContactData} />
+                </div>
+            )
+        }
+        return summary;
     }
 }
 
 const mapStateToProps = state => {
     return ({
-        ing: state.ingredients
+        ing: state.burgerBuilderReducer.ingredients,
+        purchased: state.orderReducer.purchased
     })
 }
 

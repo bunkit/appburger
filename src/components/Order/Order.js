@@ -36,6 +36,7 @@ const order = (props) => {
                 <br />
             </div>
             <p className={classes.Price}> <strong> USD {props.price} </strong> </p>
+            <button onClick={props.cancelOrder} className={classes.Cancel}>Cancel Order</button>
         </div>
     )
 }
