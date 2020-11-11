@@ -5,6 +5,8 @@ import classes from './ContactData.module.css';
 import axios from '../../../axios-orders'
 import Spinner from '../../../components/UI/Spinener/Spinner';
 import Input from '../../../components/UI/Input/Input';
+import * as actions from '../../../store/actions';
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 
 class ContactData extends Component {
     state = {
@@ -111,7 +113,6 @@ class ContactData extends Component {
                 touched: false
             }
         },
-        loading: false,
         formValid: false
     }
     cekVaidity(value, rules = true) {
@@ -143,30 +144,23 @@ class ContactData extends Component {
         return dataValidity;
     }
     componentDidMount() {
-        // console.log(this.props.ingredients, this.props.totalPrice,);
+
     }
     orderHandler = (event) => {
         event.preventDefault();
-        this.setState({ loading: true });
         const formData = {}
         for (const key in this.state.orderForm) {
             formData[key] = this.state.orderForm[key].value;
         }
+
         const order = {
             ingredients: this.props.ing,
             price: this.props.price.toFixed(2),
             orderData: formData
         }
-        axios.post('/orders.json', order)
-            .then(response => {
-                this.setState({
-                    loading: false,
-                });
-                this.props.history.push('/orders');
-            })
-            .catch(error => {
-                this.setState({ loading: false, });
-            })
+
+        this.props.onOrderBurger(order);
+
     }
 
     inputChangedHandler = (e, identifier) => {
@@ -201,7 +195,7 @@ class ContactData extends Component {
             })
         }
         let form =
-            this.state.loading ?
+            this.props.loading ?
                 <Spinner /> :
                 <div><h4>Enter your Contact Data</h4>
                     <form onSubmit={this.orderHandler}>
@@ -226,16 +220,33 @@ class ContactData extends Component {
         return (
             <div className={classes.ContactData}>
                 {form}
+                <div style={{ color: 'red' }}>
+                    <strong>
+                        {this.props.error}
+                    </strong>
+                </div>
             </div>
         )
     }
 }
 
 const mapStateToProps = state => {
+    const burger = state.burgerBuilderReducer;
+    const order = state.orderReducer;
     return ({
-        ing: state.ingredients,
-        price: state.totalPrice
+        ing: burger.ingredients,
+        price: burger.totalPrice,
+        loading: order.loading,
+        error: order.error,
+
     })
 }
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = dispatch => {
+    return {
+        onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+    }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
