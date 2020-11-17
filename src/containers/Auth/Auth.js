@@ -1,10 +1,13 @@
 import classes from './Auth.module.css';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
-import * as actions from '../../store/actions/'
+import Spinner from '../../components/UI/Spinener/Spinner';
+
+import * as action from '../../store/actions/';
 
 class Auth extends Component {
 
@@ -35,7 +38,8 @@ class Auth extends Component {
                 },
                 value: '',
                 validation: {
-                    required: true
+                    required: true,
+                    minLength: 6
                 },
                 valid: {
                     value: false,
@@ -44,7 +48,13 @@ class Auth extends Component {
                 touched: false
             },
         },
-        formValid: false
+        formValid: false,
+        isLogin: true
+    }
+    componentDidMount() {
+        if (!this.props.buildingBurger && this.props.redirectPath !== '/') {
+            this.props.onSetAuthPath()
+        }
     }
 
     cekVaidity(value, rules = true) {
@@ -104,8 +114,17 @@ class Auth extends Component {
         for (const key in this.state.formElement) {
             formData[key] = this.state.formElement[key].value;
         }
-        console.log(formData)
-        this.props.onAuth(formData.email, formData.password);
+        // console.log(formData)
+        this.props.onAuth(formData.email, formData.password, this.state.isLogin);
+    }
+
+    switchModeHandler = (e) => {
+        e.preventDefault();
+        this.setState(prevState => {
+            return {
+                isLogin: !prevState.isLogin
+            }
+        });
     }
 
     render() {
@@ -116,37 +135,63 @@ class Auth extends Component {
                 config: this.state.formElement[key]
             })
         }
-        const form = formElement.map(formItem => {
-            return (
-                <Input
-                    key={formItem.id}
-                    elementType={formItem.config.elementType}
-                    elementConfig={formItem.config.elementConfig}
-                    value={formItem.config.value}
-                    changed={(e) => this.inputChangedHandler(e, formItem.id)}
-                    validity={formItem.config.valid}
-                    touched={formItem.config.touched}
-                    shouldValidate={formItem.config.validation}
-                />
+        let form = <Spinner />
+        const url = '';
+        let stateWord = this.state.isLogin ? 'Login' : 'Signup';
+        let linkWord = this.state.isLogin ? 'Signup' : 'Login';
+        let errorMessage = this.props.error ? this.props.error.split('_').join(' ').toLowerCase() : null;
+        if (!this.props.loading) {
+            form = (
+                <div>
+                    <h3>{stateWord}</h3>
+                    <form onSubmit={this.orderHandler}>
+                        {formElement.map(formItem => {
+                            return (
+                                <Input
+                                    key={formItem.id}
+                                    elementType={formItem.config.elementType}
+                                    elementConfig={formItem.config.elementConfig}
+                                    value={formItem.config.value}
+                                    changed={(e) => this.inputChangedHandler(e, formItem.id)}
+                                    validity={formItem.config.valid}
+                                    touched={formItem.config.touched}
+                                    shouldValidate={formItem.config.validation}
+                                />
+                            )
+                        })}
+                        <h3 style={{ color: 'red', margin: '5px', textTransform: 'capitalize' }}>{errorMessage}</h3>
+                        <Button disabled={!this.state.formValid} btnType="Success" clicked={this.loginHandler}>{stateWord}</Button>
+                    </form>
+                    <a href={url} onClick={this.switchModeHandler}>{linkWord}</a>
+                </div>
             )
-        })
-
+        }
+        let redirect = this.props.isAuthenticated ? <Redirect to={this.props.redirectPath} /> : null;
         return (
             <div className={classes.Auth}>
-                <h3>Please Login</h3>
-                <form onSubmit={this.orderHandler}>
-                    {form}
-                    <Button disabled={!this.state.formValid} btnType="Success" clicked={this.loginHandler}>Submit</Button>
-                </form>
+                { redirect}
+                {form}
             </div>
         )
     }
 }
 
-const mapDispatchToProps = dispatch => {
+const mapStateToProps = state => {
     return {
-        onAuth: (email, password) => dispatch(actions.authenticate(email, password))
+        loading: state.authReducer.loading,
+        error: state.authReducer.error,
+        isAuthenticated: state.authReducer.token !== null,
+        redirectPath: state.authReducer.pathToRedirect,
+        buildingBurger: state.burgerBuilderReducer.buildingBurger
     }
 }
 
-export default connect(null, mapDispatchToProps)(Auth);
+const mapDispatchToProps = dispatch => {
+    return {
+        onAuth: (email, password, isLogin) => dispatch(action.authenticate(email, password, isLogin)),
+        onSetAuthPath: () => dispatch(action.authSetPathRedeirect('/'))
+
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Auth);

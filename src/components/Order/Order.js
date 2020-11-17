@@ -3,7 +3,8 @@ import classes from './Order.module.css'
 const order = (props) => {
     const ingredients = [];
     for (const key in props.ingredients) {
-        ingredients.push(key + ' : (' + props.ingredients[key] + ')')
+        if (props.ingredients[key] > 0)
+            ingredients.push(key + ' : (' + props.ingredients[key] + ')')
     }
     return (
         <div className={classes.Order}>

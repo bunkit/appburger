@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+
 import Order from '../../components/Order/Order';
 import axios from '../../axios-orders'
 import Spinner from '../../components/UI/Spinener/Spinner';
@@ -20,7 +22,7 @@ class Orders extends Component {
     }
 
     componentDidMount() {
-        this.props.onOrderInit();
+        this.props.onOrderInit(this.props.token);
     }
 
     onCancelHandlerModal = (id, data) => {
@@ -37,10 +39,9 @@ class Orders extends Component {
     }
     onYesHandler = (id) => {
         this.setState({ modalCancel: false });
-        axios.delete('/orders/' + id + '.json')
+        axios.delete('/orders/' + id + '.json?auth=' + this.props.token)
             .then(response => {
-                this.props.onOrderInit();
-                console.log(response)
+                this.props.onOrderInit(this.props.token);
             })
             .catch(error => {
                 console.log(error)
@@ -50,14 +51,14 @@ class Orders extends Component {
     render() {
         let orderList = <Spinner />;
         if (!this.props.loading) {
-            const reverse = this.props.orders.reverse();
-            const filtered = this.props.orders.filter(order => order.cancel !== true);
-            orderList = reverse.map(item => (
+            orderList = this.props.orders.map(item => (
                 <Order key={item.id} orderData={item.orderData} ingredients={item.ingredients} price={item.price} cancelOrder={() => this.onCancelHandlerModal(item.id, item.orderData)} />
             ))
         }
+        let redirect = this.props.isAuthenticated ? null : <Redirect to="/" />
         return (
             <Aux>
+                { redirect}
                 <Modal show={this.state.modalCancel} modalClosed={this.onNoHandler}>
                     <div style={{ textAlign: 'center' }}>
                         <h3>
@@ -76,7 +77,7 @@ class Orders extends Component {
                 <div style={{ width: '80%', margin: 'auto' }}>
                     {orderList}
                 </div>
-            </Aux>
+            </Aux >
         )
     }
 }
@@ -85,12 +86,14 @@ const mapStateToProps = state => {
     return {
         orders: state.orderReducer.orders,
         loading: state.orderReducer.loading,
+        token: state.authReducer.token,
+        isAuthenticated: state.authReducer.token !== null
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onOrderInit: () => dispatch(actions.fetchOrder())
+        onOrderInit: (token) => dispatch(actions.fetchOrder(token))
     }
 }
 

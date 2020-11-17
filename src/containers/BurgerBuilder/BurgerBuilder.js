@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 import Aux from '../../hoc/Aux/Aux';
 import Burger from '../../components/Burger/Burger';
@@ -39,8 +40,14 @@ class BurgerBuilder extends Component {
     }
 
     purchaseHandler = () => {
-        this.setState({ purchasing: true });
+        if (!this.props.isAuthenticated) {
+            this.props.onSetAuthPath('/checkout');
+            this.props.history.push("/auth");
+        } else {
+            this.setState({ purchasing: true })
+        }
     }
+
     purchaseCancelHandler = () => {
         this.setState({ purchasing: false });
     }
@@ -71,6 +78,7 @@ class BurgerBuilder extends Component {
                         price={this.props.tPrice}
                         purchasable={this.updatePurchaseState(this.props.igr)}
                         ordered={this.purchaseHandler}
+                        isAuthenticated={this.props.isAuthenticated}
                     />
                 </Aux>
             );
@@ -99,7 +107,8 @@ const mapStateToProps = state => {
     return {
         igr: state.burgerBuilderReducer.ingredients,
         tPrice: state.burgerBuilderReducer.totalPrice,
-        error: state.burgerBuilderReducer.error
+        error: state.burgerBuilderReducer.error,
+        isAuthenticated: state.authReducer.token !== null
     }
 }
 
@@ -108,7 +117,8 @@ const mapDispatchToProps = dispatch => {
         onAddIngredients: (ingredientName) => dispatch(action.addIngredient(ingredientName)),
         onRemoveIngredients: (ingredientName) => dispatch(action.removeIngredient(ingredientName)),
         onFetchIngredients: (url) => dispatch(action.fetchIngredients(url)),
-        onPurchaseInit: () => dispatch(action.purchaseInit())
+        onPurchaseInit: () => dispatch(action.purchaseInit()),
+        onSetAuthPath: (path) => dispatch(action.authSetPathRedeirect(path))
     }
 }
 
