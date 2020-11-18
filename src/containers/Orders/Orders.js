@@ -22,7 +22,7 @@ class Orders extends Component {
     }
 
     componentDidMount() {
-        this.props.onOrderInit(this.props.token);
+        this.props.onOrderInit(this.props.token, this.props.userId);
     }
 
     onCancelHandlerModal = (id, data) => {
@@ -87,13 +87,14 @@ const mapStateToProps = state => {
         orders: state.orderReducer.orders,
         loading: state.orderReducer.loading,
         token: state.authReducer.token,
-        isAuthenticated: state.authReducer.token !== null
+        isAuthenticated: state.authReducer.token !== null,
+        userId: state.authReducer.userId
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onOrderInit: (token) => dispatch(actions.fetchOrder(token))
+        onOrderInit: (token, userId) => dispatch(actions.fetchOrder(token, userId))
     }
 }
 
