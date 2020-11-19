@@ -7,6 +7,7 @@ import Spinner from '../../../components/UI/Spinener/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import * as actions from '../../../store/actions';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import { updateObject, cekVaidity } from '../../../shared/utility';
 
 class ContactData extends Component {
     state = {
@@ -86,7 +87,8 @@ class ContactData extends Component {
                 value: '',
                 validation: {
                     required: true,
-                    isEmail: true
+                    isEmail: true,
+                    minLength: 5
                 },
                 valid: {
                     value: false,
@@ -115,34 +117,7 @@ class ContactData extends Component {
         },
         formValid: false
     }
-    cekVaidity(value, rules = true) {
-        let isValid = true;
-        let errorMessage = null;
 
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid;
-            errorMessage = 'This field is required';
-        }
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid
-            errorMessage = 'Please enter atleast ' + rules.minLength + ' characters'
-        }
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid
-            errorMessage = 'Maximum characther is ' + rules.maxLength
-        }
-        if (rules.isEmail) {
-            const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            isValid = pattern.test(value) && isValid
-            errorMessage = 'Please user email format'
-
-        }
-        const dataValidity = {
-            value: isValid,
-            message: errorMessage
-        };
-        return dataValidity;
-    }
     componentDidMount() {
 
     }
@@ -165,25 +140,23 @@ class ContactData extends Component {
     }
 
     inputChangedHandler = (e, identifier) => {
-        const updateOrderForm = {
-            ...this.state.orderForm
-        }
-        const updatedFormElement = {
-            ...updateOrderForm[identifier]
-        };
-        updatedFormElement.value = e.target.value
-        const validity = this.cekVaidity(e.target.value, updatedFormElement.validation)
-        updatedFormElement.valid = {
+        const validity = cekVaidity(e.target.value, this.state.orderForm[identifier].validation)
+        const valid = updateObject(this.state.orderForm[identifier].valid, {
             value: validity.value,
             errorMessage: validity.message
-        }
-        updatedFormElement.touched = true
-        updateOrderForm[identifier] = updatedFormElement;
+        })
+        const updatedFormElement = updateObject(this.state.orderForm[identifier], {
+            value: e.target.value,
+            touched: true,
+            valid: valid
+        })
+        const updateOrderForm = updateObject(this.state.orderForm, {
+            [identifier]: updatedFormElement
+        })
         let formValid = true
         for (const key in updateOrderForm) {
             formValid = updateOrderForm[key].valid.value && formValid
         }
-
         this.setState({ 'orderForm': updateOrderForm, formValid: formValid });
     }
 

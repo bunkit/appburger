@@ -5,6 +5,8 @@ import { Redirect } from 'react-router-dom';
 
 class Logout extends Component {
     componentDidMount() {
+        this.props.onFetchIngredients('https://react-my-burger-d4cec.firebaseio.com/ingredients.json');
+        this.props.setPathRedirect()
         this.props.logout()
     }
     render() {
@@ -17,7 +19,9 @@ class Logout extends Component {
 
 const mapDispatchToProps = dipsatch => {
     return {
-        logout: () => dipsatch(actions.logout())
+        logout: () => dipsatch(actions.logout()),
+        onFetchIngredients: (url) => dipsatch(actions.fetchIngredients(url)),
+        setPathRedirect: () => dipsatch(actions.authSetPathRedeirect('/')),
     }
 }
 

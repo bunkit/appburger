@@ -10,6 +10,7 @@ import Orders from './containers/Orders/Orders';
 import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout';
 import * as actions from './store/actions'
+const LOCAL_STORAGE = JSON.parse(localStorage.getItem('dataAuth'));
 
 class App extends Component {
 	componentDidMount() {
@@ -58,7 +59,7 @@ class App extends Component {
 
 const mapStateToProps = state => {
 	return {
-		isAuthenticated: state.authReducer.token !== null
+		isAuthenticated: LOCAL_STORAGE !== null
 	}
 }
 const mapDispatchToProps = dispatch => {

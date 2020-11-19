@@ -11,6 +11,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import Aux from '../../hoc/Aux/Aux';
 import Button from '../../components/UI/Button/Button';
 
+const LOCAL_STORAGE = JSON.parse(localStorage.getItem('dataAuth'));
 
 class Orders extends Component {
 
@@ -21,8 +22,9 @@ class Orders extends Component {
         idOrder: ''
     }
 
+
     componentDidMount() {
-        this.props.onOrderInit(this.props.token, this.props.userId);
+        this.props.onOrderInit(LOCAL_STORAGE.token, LOCAL_STORAGE.userId);
     }
 
     onCancelHandlerModal = (id, data) => {
@@ -55,7 +57,7 @@ class Orders extends Component {
                 <Order key={item.id} orderData={item.orderData} ingredients={item.ingredients} price={item.price} cancelOrder={() => this.onCancelHandlerModal(item.id, item.orderData)} />
             ))
         }
-        let redirect = this.props.isAuthenticated ? null : <Redirect to="/" />
+        let redirect = LOCAL_STORAGE ? null : <Redirect to="/" />
         return (
             <Aux>
                 { redirect}
