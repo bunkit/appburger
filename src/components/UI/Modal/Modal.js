@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Aux from '../../../hoc/Aux/Aux';
 import classes from './Modal.module.css'
 import BackDrop from '../Backdrop/Backdrop';
 
 const Modal = (props) => {
-    useEffect(() => {
-        console.log('[modal.js] useEffect');
-    }, [props.show]);
     return (
         <Aux>
             <BackDrop show={props.show} clicked={props.modalClosed} />

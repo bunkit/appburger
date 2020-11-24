@@ -41,9 +41,9 @@ class Orders extends Component {
     }
     onYesHandler = (id) => {
         this.setState({ modalCancel: false });
-        axios.delete('/orders/' + id + '.json?auth=' + this.props.token)
+        axios.delete('/orderss/' + id + '.json?auth=' + this.props.token)
             .then(response => {
-                this.props.onOrderInit(this.props.token);
+                this.props.onOrderInit(this.props.token, this.props.userId);
             })
             .catch(error => {
                 console.log(error)

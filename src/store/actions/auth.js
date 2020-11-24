@@ -60,10 +60,8 @@ export const authenticate = (email, password, isLogin) => {
                 dispatch(checkAuthTimeout(response.data.expiresIn))
                 dispatch(authCheckLocalStorage())
 
-                console.log(response)
             })
             .catch(err => {
-                console.log(err)
                 dispatch(authFail(err.response.data.error.message))
             });
     }

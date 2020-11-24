@@ -6,7 +6,7 @@ import { Redirect } from 'react-router-dom';
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
 import Spinner from '../../components/UI/Spinener/Spinner';
-
+import { cekVaidity } from '../../shared/utility';
 import * as action from '../../store/actions/';
 
 class Auth extends Component {
@@ -57,35 +57,6 @@ class Auth extends Component {
         }
     }
 
-    cekVaidity(value, rules = true) {
-        let isValid = true;
-        let errorMessage = null;
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid;
-            errorMessage = 'This field is required';
-        }
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid
-            errorMessage = 'Please enter atleast ' + rules.minLength + ' characters'
-        }
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid
-            errorMessage = 'Maximum characther is ' + rules.maxLength
-        }
-        if (rules.isEmail) {
-            const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            isValid = pattern.test(value) && isValid
-            errorMessage = 'Please user email format'
-
-        }
-        const dataValidity = {
-            value: isValid,
-            message: errorMessage
-        };
-        return dataValidity;
-    }
-
     inputChangedHandler = (e, identifier) => {
         const updatedForm = {
             ...this.state.formElement
@@ -94,7 +65,7 @@ class Auth extends Component {
             ...updatedForm[identifier]
         };
         updatedFormElement.value = e.target.value
-        const validity = this.cekVaidity(e.target.value, updatedFormElement.validation)
+        const validity = cekVaidity(e.target.value, updatedFormElement.validation)
         updatedFormElement.valid = {
             value: validity.value,
             errorMessage: validity.message
@@ -114,7 +85,6 @@ class Auth extends Component {
         for (const key in this.state.formElement) {
             formData[key] = this.state.formElement[key].value;
         }
-        // console.log(formData)
         this.props.onAuth(formData.email, formData.password, this.state.isLogin);
     }
 
