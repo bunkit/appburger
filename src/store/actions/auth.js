@@ -1,7 +1,7 @@
 import * as actionTypes from './actionTypes';
 import axios from 'axios';
 
-const AUTH_KEY = 'AIzaSyD6PmrR1-MzDxou5bBYX_QxRgdoIbhsZZ0';
+const AUTH_KEY = process.env.REACT_APP_BURGER_API_KEY;
 
 export const authStart = () => {
     return {

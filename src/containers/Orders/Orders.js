@@ -11,7 +11,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import Aux from '../../hoc/Aux/Aux';
 import Button from '../../components/UI/Button/Button';
 
-const LOCAL_STORAGE = JSON.parse(localStorage.getItem('dataAuth'));
+
 
 class Orders extends Component {
 
@@ -24,6 +24,7 @@ class Orders extends Component {
 
 
     componentDidMount() {
+        const LOCAL_STORAGE = JSON.parse(localStorage.getItem('dataAuth'));
         this.props.onOrderInit(LOCAL_STORAGE.token, LOCAL_STORAGE.userId);
     }
 
@@ -51,6 +52,7 @@ class Orders extends Component {
             })
     }
     render() {
+        const LOCAL_STORAGE = JSON.parse(localStorage.getItem('dataAuth'));
         let orderList = <Spinner />;
         if (!this.props.loading) {
             orderList = this.props.orders.map(item => (
